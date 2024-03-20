@@ -66,16 +66,9 @@ namespace System_For_AnalyzingProject
         /// <param name="Li">Искомый символ</param>
         private int Indexing(char Li)
         {
-            try
-            {
-                for (int I1 = 0; I1 < Headlines.Length; I1++)
+            for (int I1 = 0; I1 < Headlines.Length; I1++)
                     if (Li == Headlines[I1]) return I1;
                 throw new Exception();
-            }
-            catch (Exception Ex)
-            {
-                MessageBox.Show($"Encryption#Indexing\n{Ex.Message}", "Неизвестная ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error); return -1;
-            }
         }
 
         /// <summary> Закодирование </summary>
