@@ -15,6 +15,8 @@
         Panel,
         Form,
         CorrectnessDataDisplayOnForms,
-        System
+        System,
+        OtherOnForm,
+        Other
     }
 }

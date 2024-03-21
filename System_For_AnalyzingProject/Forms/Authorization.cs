@@ -73,13 +73,10 @@ namespace System_For_AnalyzingProject
                     Connect.Close();
                 }
 
-                //TB_Login.Text = Cod.Encoding(TB_Login.Text);
-                //TB_Password.Text = Cod.Encoding(TB_Password.Text);
-
                 if (T)
                 {
                     LoG.Info($"Button_Enter_Click|Успешная аутентификации");
-                    MessageBox.Show("GOOD");
+                    Hide(); new Main().ShowDialog(); Show();
                 }
                 else throw new Exceptions.Errors.Authentication();
             }
@@ -100,7 +97,7 @@ namespace System_For_AnalyzingProject
         /// Регистрация
         /// </summary>
         private void Button_Register_Click(object sender, EventArgs e)
-            => new Registration().ShowDialog();
+        { Hide(); new Registration().ShowDialog(); Show(); }
 
         /// <summary>
         /// Быстрая авторизация </br> 
@@ -108,7 +105,10 @@ namespace System_For_AnalyzingProject
         /// </summary>
         private void panel1_Click(object sender, EventArgs e)
         {
-            TB_Login.Text = "Gulding28@kur"; TB_Password.Text = "Sp(9hv*3pr&O";
+            TB_Login.Text = "GuldinGRg28@kuri"; TB_Password.Text = "Sp(9HGED*3pr&O";
+            //bool[] Bools = { true, false, true, true };
+            //Encryption Cod = new Encryption(Bools, "Gridobi52", 2);
+            //TB_Password.Text = Cod.Decoding(TB_Login.Text);
         }
     }
 }

@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestingDefect.cs" />
+    <Compile Include="Cases\TestingDefect.cs" />
     <Compile Include="Directories\TestedElemnets.cs" />
     <Compile Include="Directories\TestingTypes.cs" />
     <Compile Include="Exceptions\Errors\0002. Registration.cs" />

@@ -19,7 +19,7 @@ namespace System_For_AnalyzingProject
 
         private void Output()
         {
-tableLayoutPanel1.Controls.Clear();
+            tableLayoutPanel1.Controls.Clear();
         }
     }
 }
