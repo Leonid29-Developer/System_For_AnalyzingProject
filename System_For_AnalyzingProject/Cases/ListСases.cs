@@ -14,6 +14,9 @@ namespace System_For_AnalyzingProject
         /// <summary> Конструктор </summary>
         public ListСases() { }
 
+        /// <summary> Получение количества кейсов в списке </summary>
+        public int GetCount() => Cases.Count;
+
         /// <summary> Добавление кейса в список </summary>
         /// <param name="List">Список с кейсами</param>
         /// <param name="Case">Кейс тестирования</param>
@@ -51,11 +54,21 @@ namespace System_For_AnalyzingProject
             }
         }
 
+        /// <summary>  Вычисления процента реализации </summary>
+        public int ImplementationPercentage()
+        {
+            int Count = 0;
+
+            foreach (TestingDefect Case in Cases)
+                if (Case.GetResult()) Count++;
+
+            return (int)((float)Count / (float)Cases.Count * 100);
+        }
+
         /// <summary> Описание использованных методов тестирования какими кейсами </summary>
         public string UsingCaseTestingMethod()
         {
-            string Final = "В ходе тестирования было использовано несколько методов, а именно:\n";
-
+            string Final = "";
             List<TestedElemnets> Elemnets = new List<TestedElemnets>();
             List<ElementsWithType> Types = new List<ElementsWithType>();
 
@@ -80,7 +93,7 @@ namespace System_For_AnalyzingProject
             // Описание типа тестирования, тестируемого элемента и какие номера кейсов использовались
             foreach (TestedElemnets Elemnet in Elemnets)
             {
-                List<int> Indexes = new List<int>();
+                List<int> Indexes = new List<int>(); 
 
                 if (Elemnet == TestedElemnets.OtherOnForm | Elemnet == TestedElemnets.Other)
                 {
@@ -88,7 +101,7 @@ namespace System_For_AnalyzingProject
                         if (Case.GetTestedElemnet() == Elemnet)
                         { Indexes.Add(Cases.IndexOf(Case) + 1); break; }
 
-                    Final += $"-    {Cases[Indexes[0] - 1]} ";
+                    Final += $"{Cases[Indexes[0] - 1]} ";
                 }
                 else
                 {
@@ -100,27 +113,27 @@ namespace System_For_AnalyzingProject
                     switch (Elemnet)
                     {
                         default:
-                            Final += $"-    Проверка работоспособности {Elemnet} ";
+                            Final += $"Проверка работоспособности {Elemnet} ";
                             break;
 
                         case TestedElemnets.Form:
-                            Final += $"-    Проверка работоспособности форм программы ";
+                            Final += $"Проверка работоспособности форм программы ";
                             break;
 
                         case TestedElemnets.CorrectnessDataDisplayOnForms:
-                            Final += $"-    Проверка корректности отображения данных на формах ";
+                            Final += $"Проверка корректности отображения данных на формах ";
                             break;
 
                         case TestedElemnets.ConnectingDatabaseToForm:
-                            Final += $"-    Проверка работоспособности подключения БД ";
+                            Final += $"Проверка работоспособности подключения БД ";
                             break;
 
                         case TestedElemnets.DBTable:
-                            Final += $"-    Проверка работоспособности таблицы БД ";
+                            Final += $"Проверка работоспособности таблицы БД ";
                             break;
 
                         case TestedElemnets.System:
-                            Final += $"-    Проверка полной работоспособности системы ";
+                            Final += $"Проверка полной работоспособности системы ";
                             break;
                     }
                 }
@@ -176,6 +189,7 @@ namespace System_For_AnalyzingProject
                     }
             }
 
+            if (Final[Final.Length-1] == '\n') Final = Final.Remove(Final.Length-1,1);
             return Final;
         }
 
@@ -199,7 +213,7 @@ namespace System_For_AnalyzingProject
         }
 
         /// <summary> Увеличение количества повторений тестируемого элемента </summary>
-        public void CountElemnetAdd(List<ElementsWithType> List, TestedElemnets DesiredElemnet)
+        private void CountElemnetAdd(List<ElementsWithType> List, TestedElemnets DesiredElemnet)
         {
             int Count = 0;
             foreach (ElementsWithType EWT in List)
@@ -207,6 +221,15 @@ namespace System_For_AnalyzingProject
 
             foreach (ElementsWithType EWT in List)
                 if (DesiredElemnet == EWT.Elemnet) EWT.CountElemnet = Count;
+        }
+
+        /// <summary> Индексатор </summary>
+        public TestingDefect this[int Index]
+        {
+            get
+            {
+                return Cases[Index];
+            }
         }
     }
 }

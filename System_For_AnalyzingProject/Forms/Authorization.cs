@@ -27,6 +27,9 @@ namespace System_For_AnalyzingProject
         /// <summary>  Показан или спрятан пароль </summary>
         private bool HideOrShow = true;
 
+        /// <summary>  Зашифрованный логин пользователя, находящегося в данной сессии </summary>
+        public static string EncLogin { private set; get; }
+
         /// <summary> Показать или спрятать ввод пароля </summary>
         private void Password_HideOrShow_Click(object sender, EventArgs e)
         {
@@ -75,6 +78,10 @@ namespace System_For_AnalyzingProject
 
                 if (T)
                 {
+                    bool[] Bools2 = { true, false, true, true };
+                    Encryption Cod2 = new Encryption(Bools2, "#Login#", 4);
+                    EncLogin = Cod2.Encoding(TB_Login.Text);
+
                     LoG.Info($"Button_Enter_Click|Успешная аутентификации");
                     Hide(); new Main().ShowDialog(); Show();
                 }

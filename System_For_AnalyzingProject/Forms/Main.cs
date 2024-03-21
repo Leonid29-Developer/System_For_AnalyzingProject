@@ -1,4 +1,7 @@
 ﻿using Spire.Doc;
+using Spire.Doc.Documents;
+using Spire.Doc.Fields;
+using SpiceHorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +11,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Spire.Doc.Formatting;
+using Spire.Doc.Fields.Shapes;
+using Spire.Doc.Fields.Shapes.Charts;
+using System.Reflection;
+using System.Drawing.Imaging;
+using System.Data.SqlClient;
 
 namespace System_For_AnalyzingProject
 {
@@ -20,8 +29,6 @@ namespace System_For_AnalyzingProject
 
         private void Output()
         {
-            ////tableLayoutPanel1.Controls.Clear();
-
             // Создание списка кейсов
             ListСases Cases = new ListСases();
             _ = Cases + new TestingDefect(TestingTypes.ManualTesting, TestedElemnets.TextBox, "Введите логин", "Авторизация", "", true);
@@ -41,73 +48,152 @@ namespace System_For_AnalyzingProject
             Document DocumentWord = new Document();
 
             // Загрузка шаблона
-            DocumentWord.LoadFromFile($@"{Application.StartupPath}\Resources\TT.docx"); //document.LoadFromFile($@"{Application.StartupPath}\..\\TT.docx");
+            DocumentWord.LoadFromFile($@"{Application.StartupPath}\Resources\TT.docx");
 
-            //Обработка данных
-            //string[] DateString = Statement_Date.Text.Split('.');
-            //DateTime StatementDate = new DateTime(Convert.ToInt32(DateString[2]), Convert.ToInt32(DateString[1]), Convert.ToInt32(DateString[0]));
-            //DateString = Statement_Date.Text.Split('.');
-            //DateTime TestReportDate = new DateTime(Convert.ToInt32(DateString[2]), Convert.ToInt32(DateString[1]), Convert.ToInt32(DateString[0]));
-            //string[] KeyMonth = new string[]
-            //{"Январь" ,"Февраль","Март","Апрель" ,"Май","Июнь" ,"Июль" ,"Август","Сентябрь","Октябрь","Ноябрь","Декабрь" };
-            //string Deviations2 = "соответствует"; if (Deviations.SelectedIndex == 1) Deviations2 = "не соответствует";
+            // Создание таблицы и добавление в документ
+            {
+                Section WordSection = DocumentWord.Sections[0];
+                TextSelection WordSelection = DocumentWord.FindString("#DefectReport#", true, true);
+                TextRange TRange = WordSelection.GetAsOneRange();
+                Paragraph PG = TRange.OwnerParagraph;
+                Body WordBody = PG.OwnerTextBody;
+                int Index = WordBody.ChildObjects.IndexOf(PG);
+                Table WordTable = WordSection.AddTable(true);
+                WordTable.ResetCells(Cases.GetCount() + 1, 3);
+                {
+                    for (int I1 = 0; I1 < Cases.GetCount() + 1; I1++)
+                    {
+                        TableRow WordRow = WordTable.Rows[I1];
+                        {
+                            WordRow.Cells[0].SetCellWidth(48, CellWidthType.Point);
+                            WordRow.Cells[1].SetCellWidth(304, CellWidthType.Point);
+                            WordRow.Cells[2].SetCellWidth(112, CellWidthType.Point);
+                        }
 
+                        if (I1 == 0)
+                        {
+                            Paragraph Para = WordTable[I1, 0].AddParagraph();
+                            Word(Para, SpiceHorizontalAlignment.Center, "№ кейса", true);
 
+                            Para = WordTable[I1, 1].AddParagraph();
+                            Word(Para, SpiceHorizontalAlignment.Center, "Описание", true);
+
+                            Para = WordTable[I1, 2].AddParagraph();
+                            Word(Para, SpiceHorizontalAlignment.Center, "Результат", true);
+                        }
+                        else for (int I2 = 0; I2 < 3; I2++)
+                            {
+                                Paragraph Para = WordTable[I1, I2].AddParagraph();
+
+                                switch (I2)
+                                {
+                                    case 0:
+                                        Word(Para, SpiceHorizontalAlignment.Center, I1.ToString(), false);
+                                        break;
+
+                                    case 1:
+                                        Word(Para, SpiceHorizontalAlignment.Left, Cases[I1 - 1].ToStringWithNames(), false);
+                                        break;
+
+                                    case 2:
+                                        if (Cases[I1 - 1].GetResult())
+                                            Word(Para, SpiceHorizontalAlignment.Center, "Положительно", false);
+                                        else
+                                            Word(Para, SpiceHorizontalAlignment.Center, "Отрицательно", false);
+                                        break;
+                                }
+                            }
+                    }
+                }
+                WordBody.ChildObjects.Remove(PG); WordBody.ChildObjects.Insert(Index, WordTable);
+            }
+
+            // Создание круговой диаграммы и добавление в документ
+            int Percentage = Cases.ImplementationPercentage();
+            {
+                TextSelection WordSelection = DocumentWord.FindString("#PieChart#", true, true);
+                TextRange TRange = WordSelection.GetAsOneRange();
+                Paragraph Para = TRange.OwnerParagraph;
+                ShapeObject Shape = Para.AppendChart(ChartType.Pie, 420, 260);
+                { Shape.FillColor = Color.White; }
+                Chart WordChart = Shape.Chart;
+                {
+                    WordChart.Series.Clear();
+                    WordChart.Series.Add("", new string[] { "Реализовано", "Не реализовано" }, new double[] { Percentage, 100 - Percentage });
+                    WordChart.Legend.Position = LegendPosition.Right;
+                    WordChart.Legend.Overlay = false;
+                    WordChart.Title.Show = false;
+                }
+            }
+
+            // Обработка данных
+            string ProductReadiness, ProductReadiness2, TesterName = "";
+            {
+                if (Percentage > 85)
+                { ProductReadiness = "готово"; ProductReadiness2 = "позволяет"; }
+                else
+                { ProductReadiness = "не готово"; ProductReadiness2 = "не позволяет"; }
+
+                using (SqlConnection Connect = new SqlConnection("Data Source='';Integrated Security=True"))
+                {
+                    Connect.Open();
+
+                    using (SqlCommand Command = new SqlCommand("[System_For_AnalyzingProject].[dbo].[GetFIO]", Connect))
+                    {
+                        Command.CommandType = CommandType.StoredProcedure;
+
+                        bool[] Bools = { true, false, true, true };
+                        Encryption Cod = new Encryption(Bools, "Gridobi52", 2);
+
+                        bool[] Bools2 = { true, false, true, true };
+                        Encryption Cod2 = new Encryption(Bools, "#Login#", 4);
+
+                        bool[] Bools3 = { true, true, false, false };
+                        Encryption Cod3 = new Encryption(Bools3, "Loridut", 1);
+
+                        Command.Parameters.Add("@Login", SqlDbType.NVarChar, 32);
+                        Command.Parameters["@Login"].Value = Cod.Encoding(Cod2.Decoding(Authorization.EncLogin));
+
+                        SqlDataReader Reader = Command.ExecuteReader(); while (Reader.Read())
+                        {
+                            TesterName = $"{Cod3.Decoding((string)Reader.GetValue(0))} {Cod3.Decoding((string)Reader.GetValue(1))[0]}.";
+                            if ((string)Reader.GetValue(2) != "") TesterName += $" {Cod3.Decoding((string)Reader.GetValue(2))[0]}.";
+                        }
+
+                    }
+
+                    Connect.Close();
+                }
+            }
 
             // Сохранение старых строк — «заполнителей» и новых строк в словаре
             Dictionary<string, string> ReplaceDict = new Dictionary<string, string>
-                    {
-                { "#EXPERTORGANIZATIONNAME#", Cases.UsingCaseTestingMethod() }
-                        //{ "#EXPERTORGANIZATIONNAME#", ExpertOrganizationName.Text.ToUpper() },
-                        //{ "#ExpertOrganizationAddress#", ExpertOrganizationAddress.Text },
-                        //{ "#ExpertOrganizationNumber#", ExpertOrganizationNumber.Text },
-                        //{ "#ExpertOrganization_Head_Position#", ExpertOrganization_Head_Position.Text },
-                        //{
-                        //    "#ExpertOrganization_Head_FIO#",
-                        //    $"{ExpertOrganization_Head_Surname.Text} {ExpertOrganization_Head_Name.Text[0]}. {ExpertOrganization_Head_MiddleName.Text[0]}."
-                        //},
-                        //{ "#Statement_Number#", Statement_Number.Text },
-                        //{
-                        //    "#Statement_Date#",
-                        //    $"«{StatementDate.Day}» {KeyMonth[StatementDate.Month]} {StatementDate.Year} г."
-                        //},
-                        //{ "#StatementOrganization_Name#", StatementOrganization_Name.Text },
-                        //{ "#StatementOrganization_Address#", StatementOrganization_Address.Text },
-                        //{ "#ManufacturerOrganization_Name#", ManufacturerOrganization_Name.Text },
-                        //{ "#ManufacturerOrganization_Address#", ManufacturerOrganization_Address.Text },
-                        //{ "#Statement_Name#", Statement_Name.Text },
-                        //{ "#TestReport_Number#", TestReport_Number.Text },
-                        //{
-                        //    "#TestReport_Date#",
-                        //    $"«{TestReportDate.Day}» {KeyMonth[TestReportDate.Month]} {TestReportDate.Year} г."
-                        //},
-                        //{ "#TestReport_Organization_Name#", TestReport_Organization_Name.Text },
-                        //{ "#TestReport_Organization_RegistrationNumber#", TestReport_Organization_RegistrationNumber.Text },
-                        //{ "#TestResults_Number1#", TestResults_Number1.Text },
-                        //{ "#TestResults_Number2#", TestResults_Number2.Text },
-                        //{ "#TestResults_Number3#", TestResults_Number3.Text },
-                        //{ "#TestResults_Number4#", TestResults_Number4.Text },
-                        //{ "#TestResults_Number5#", TestResults_Number5.Text },
-                        //{ "#TestResults_Number6#", TestResults_Number6.Text },
-                        //{ "#TestResults_Number7#", TestResults_Number7.Text },
-                        //{ "#TestResults_Number8#", TestResults_Number8.Text },
-                        //{ "#TestResults_Number9#", TestResults_Number9.Text },
-                        //{ "#TestResults_Number10#", TestResults_Number10.Text },
-                        //{ "#Deviations#", Deviations.Text.ToLower() },
-                        //{ "#Deviations2#", Deviations2.ToLower() },
-                        //{
-                        //    "#ExpertOrganization_Expert#",
-                        //    $"{ExpertOrganization_Expert_Surname.Text} {ExpertOrganization_Expert_Name.Text[0]}. {ExpertOrganization_Expert_MiddleName.Text[0]}."
-                        //},
-                    };
+            {  
+                { "#UsingCaseTesting#", Cases.UsingCaseTestingMethod() },
+                { "#PieChart#", "" },
+                { "#ProductReadiness#", ProductReadiness },
+                { "#PercentageOfSales#", Percentage.ToString() },
+                { "#PercentageNotImplementation#", (100-Percentage).ToString() },
+                { "#ProductReadiness2#", ProductReadiness2 },
+                { "#TesterName#", TesterName }
+            };
 
             foreach (KeyValuePair<string, string> KVP in ReplaceDict) DocumentWord.Replace(KVP.Key, KVP.Value, true, true);
 
             // Сохранение файла документа
-            DocumentWord.SaveToFile($@"{Application.StartupPath}\..\ReplacePlaceholders.docx", FileFormat.Docx); DocumentWord.Close();
+            DocumentWord.SaveToFile($@"{Application.StartupPath}\ReplacePlaceholders.docx", FileFormat.Docx); DocumentWord.Close();
 
             // Открытие файла документа
-            System.Diagnostics.Process.Start($@"{Application.StartupPath}\..\ReplacePlaceholders.docx"); Close();
+            System.Diagnostics.Process.Start($@"{Application.StartupPath}\ReplacePlaceholders.docx"); Close();
+        }
+
+        private void Word(Paragraph Para, SpiceHorizontalAlignment Alignment, string Text, bool TBold)
+        {
+            Para.Format.HorizontalAlignment = Alignment;
+            TextRange TableRange = Para.AppendText(Text);
+            TableRange.CharacterFormat.FontName = "Times New Roman";
+            TableRange.CharacterFormat.FontSize = 14;
+            TableRange.CharacterFormat.Bold = TBold;
         }
     }
 }
