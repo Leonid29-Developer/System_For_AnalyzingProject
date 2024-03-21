@@ -79,5 +79,15 @@ namespace System_For_AnalyzingProject.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] TT {
+            get {
+                object obj = ResourceManager.GetObject("TT", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

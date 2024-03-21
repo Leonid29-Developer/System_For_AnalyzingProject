@@ -36,6 +36,9 @@
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.5.2.8\lib\net46\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="Spire.Doc, Version=12.2.0.0, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.Doc.12.2.0\lib\net40\Spire.Doc.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -54,6 +57,7 @@
     <Compile Include="Cases\TestingDefect.cs" />
     <Compile Include="Directories\TestedElemnets.cs" />
     <Compile Include="Directories\TestingTypes.cs" />
+    <Compile Include="Cases\ElementsWithType.cs" />
     <Compile Include="Exceptions\Errors\0002. Registration.cs" />
     <Compile Include="Exceptions\Information\0001. Registration.cs" />
     <Compile Include="Forms\Authorization.cs">
@@ -70,6 +74,7 @@
     <Compile Include="Forms\Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="Cases\ListСases.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Forms\Registration.cs">
@@ -107,6 +112,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\TT.docx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
