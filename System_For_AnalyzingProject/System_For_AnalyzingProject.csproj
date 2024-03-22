@@ -120,8 +120,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\StackOfPaper.png" />
+    <Content Include="Images\Hammer.png" />
+    <Content Include="Images\Save.png" />
     <Content Include="Images\EyeClose.png" />
     <Content Include="Images\EyeOpen.png" />
+    <Content Include="Images\Trashcan.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

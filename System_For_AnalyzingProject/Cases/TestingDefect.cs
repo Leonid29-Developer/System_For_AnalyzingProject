@@ -78,11 +78,11 @@
                     Final = $"Проверка полной работоспособности системы";
                     break;
 
-                case TestedElemnets.OtherOnForm:
+                case TestedElemnets.Other:
                     Final = $"{TextAnotherElement}";
                     break;
 
-                case TestedElemnets.Other:
+                case TestedElemnets.OtherOnForm:
                     Final = $"{TextAnotherElement}";
                     break;
             }
@@ -95,32 +95,17 @@
         {
             string Final;
 
-            switch (TestedElemnet)
-            {
-                default:
-                    Final = $"{ToString()} «{NameTestedElemnet}» в форме «{FormName}»";
-                    break;
-
-                case TestedElemnets.Form:
-                    Final = $"Проверка работоспособности формы «{NameTestedElemnet}»";
-                    break;
-
-                case TestedElemnets.CorrectnessDataDisplayOnForms:
-                    Final = $"{ToString()} на форме «{NameTestedElemnet}»";
-                    break;
-
-                case TestedElemnets.OtherOnForm:
-                    Final = $"{TextAnotherElement} на форме «{FormName}»";
-                    break;
-
-                case TestedElemnets.Other:
-                    Final = $"{ToString()}";
-                    break;
-
-                case TestedElemnets.System:
-                    Final = $"{ToString()}";
-                    break;
-            }
+            if (TestedElemnet == TestedElemnets.OtherOnForm)
+                Final = $"{ToString()} на форме «{FormName}»";
+            else if (TestedElemnet == TestedElemnets.CorrectnessDataDisplayOnForms)
+                Final = $"{ToString()} на форме «{NameTestedElemnet}»";
+            else if (TestedElemnet == TestedElemnets.Form |
+                      TestedElemnet == TestedElemnets.ConnectingDatabaseToForm |
+                      TestedElemnet == TestedElemnets.DBTable |
+                        TestedElemnet == TestedElemnets.Other |
+                        TestedElemnet == TestedElemnets.System)
+                Final = $"{ToString()}";
+            else Final = $"{ToString()} «{NameTestedElemnet}» в форме «{FormName}»";
 
             return Final;
         }

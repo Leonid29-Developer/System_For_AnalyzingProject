@@ -3,12 +3,12 @@
     /// <summary> Директория. Типы тестирования </summary>
     public enum TestingTypes
     {
-        ManualTesting,
-        IntegrationTesting,
-        WhiteBoxTesting,
-        DescendingTesting,
-        ModularTesting,
-        AcceptanceTesting,
-        LoadTesting
+        ManualTesting, // Ручное тестирование
+        IntegrationTesting, // Интеграционное тестирование
+        WhiteBoxTesting,  // Тестирование белым ящиком
+        DescendingTesting, // Нисходящее тестирование
+        ModularTesting, // Модульное тестирование
+        AcceptanceTesting, // Приемочное тестирование
+        LoadTesting // Нагрузочное тестирование
     }
 }
