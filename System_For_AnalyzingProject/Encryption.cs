@@ -67,8 +67,8 @@ namespace System_For_AnalyzingProject
         private int Indexing(char Li)
         {
             for (int I1 = 0; I1 < Headlines.Length; I1++)
-                    if (Li == Headlines[I1]) return I1;
-                throw new Exception();
+                if (Li == Headlines[I1]) return I1;
+            throw new Exception();
         }
 
         /// <summary> Закодирование </summary>

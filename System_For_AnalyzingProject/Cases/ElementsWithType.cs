@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace System_For_AnalyzingProject
+﻿namespace System_For_AnalyzingProject
 {
     /// <summary> Класс для хранения типа тестирования для конкретного тестового элемента </summary>
     public class ElementsWithType

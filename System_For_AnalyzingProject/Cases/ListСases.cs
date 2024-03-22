@@ -93,7 +93,7 @@ namespace System_For_AnalyzingProject
             // Описание типа тестирования, тестируемого элемента и какие номера кейсов использовались
             foreach (TestedElemnets Elemnet in Elemnets)
             {
-                List<int> Indexes = new List<int>(); 
+                List<int> Indexes = new List<int>();
 
                 if (Elemnet == TestedElemnets.OtherOnForm | Elemnet == TestedElemnets.Other)
                 {
@@ -189,7 +189,7 @@ namespace System_For_AnalyzingProject
                     }
             }
 
-            if (Final[Final.Length-1] == '\n') Final = Final.Remove(Final.Length-1,1);
+            if (Final[Final.Length - 1] == '\n') Final = Final.Remove(Final.Length - 1, 1);
             return Final;
         }
 
